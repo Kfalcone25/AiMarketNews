@@ -19,3 +19,4 @@ Thumbs.db
 
 # Secrets (future-proof)
 .env
+AiMarketNews/appsettings.json
