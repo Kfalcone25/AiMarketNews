@@ -1,47 +1,26 @@
-﻿using System;
+﻿using AiMarketNews.ConTest.Agent;
+using AiMarketNews.ConTest.LLM;
+using AiMarketNews.ConTest.Tools;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AiMarketNews.ConTest
-{
-    class Program
-    {
-        static async Task Main(string[] args)
-        {
-            var llm = new LlmService();
-
-            Console.WriteLine("Enter a news headline:");
-            var headline = Console.ReadLine();
-
-            var result = await llm.ClassifyHeadline(headline);
-
-            Console.WriteLine("\n=== Classification ===");
-            Console.WriteLine($"Primary: {result.PrimarySector}");
-            Console.WriteLine($"Secondary: {string.Join(", ", result.SecondarySectors)}");
-            Console.WriteLine($"Sentiment: {result.Sentiment}");
-            Console.WriteLine($"Confidence: {result.Confidence}");
-            Console.WriteLine($"Reasoning: {result.Reasoning}");
-        }
-    }
-}
 
 
 
-/*
-public class SectorMapper
-{
-    public Dictionary<string, string> EntityToSector = new()
-    {
-        { "NASA", "Aerospace & Defense" },
-        { "Oil", "Energy" },
-        { "AI", "Technology" }
-    };
+var llm = new LlmClient();
 
-    public string Map(string entity)
-    {
-        return EntityToSector.ContainsKey(entity)
-            ? EntityToSector[entity]
-            : "Unknown";
-    }
-}
-*/
+var tools = new ToolRegistry();
+tools.Register(new GetSectorTool());
+
+var agent = new Agent(llm, tools);
+
+Console.WriteLine("Enter headline:");
+var input = Console.ReadLine();
+
+var result = await agent.Run(input);
+
+Console.WriteLine("\n=== RESULT ===");
+Console.WriteLine(result);
+
+
