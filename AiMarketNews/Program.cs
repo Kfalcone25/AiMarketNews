@@ -1,33 +1,72 @@
 ﻿using AiMarketNews.Services.LLM;
 using AiMarketNews.Services.NewsService.MockNews;
 
-var newsService = new MockNewsService();var llmService = new LlmService();
+var newsService = new MockNewsService();
+var llmService = new LlmService();
 
 var article = newsService.GetTopHeadlines().First();
 
-var response = await llmService.AnalyzeArticleAsync(article);
-//Extracting the analysis result
-var result = response.Data;
-//Token Usage Tracking
-var usage = response.Usage;
+// ======================
+// FIRST CALL (ANALYSIS)
+// ======================
+var initialResponse = await llmService.AnalyzeArticleAsync(article);
 
-//Cost Estimation
-double costPer1K = 0.00015; // approx for gpt-4.1-mini
-double cost = (usage.TotalTokens / 1000.0) * costPer1K;
+var initialResult = initialResponse.Data;
+var initialUsage = initialResponse.Usage;
 
-//Result
-Console.WriteLine("=== RESULT ===");
-Console.WriteLine($"Sector: {result.PrimarySector}");
-Console.WriteLine($"Sentiment: {result.Sentiment}");
-Console.WriteLine($"Summary: {result.MarketImpactSummary}");
-Console.WriteLine($"Companies: {string.Join(", ", result.AffectedCompanies)}");
+// ======================
+// SECOND CALL (CRITIQUE)
+// ======================
+var improvedResponse = await llmService.CritiqueAndImproveAsync(article, initialResult);
 
-//API Token Usage Tracking
-Console.WriteLine("=== TOKEN USAGE ===");
-Console.WriteLine($"Input Tokens: {usage.InputTokens}");
-Console.WriteLine($"Output Tokens: {usage.OutputTokens}");
-Console.WriteLine($"Total Tokens: {usage.TotalTokens}");
+var improvedResult = improvedResponse.Data;
+var improvedUsage = improvedResponse.Usage;
 
-//Cost Estimation
-Console.WriteLine("=== Estimated Cost ===");
-Console.WriteLine($"Estimated Cost: ${cost:F6}");
+// ======================
+// COST CALCULATION
+// ======================
+double costPer1K = 0.00015;
+
+double initialCost = (initialUsage.TotalTokens / 1000.0) * costPer1K;
+double improvedCost = (improvedUsage.TotalTokens / 1000.0) * costPer1K;
+
+double totalTokens = initialUsage.TotalTokens + improvedUsage.TotalTokens;
+double totalCost = initialCost + improvedCost;
+
+// ======================
+// OUTPUT RESULTS
+// ======================
+
+Console.WriteLine("=== INITIAL RESULT ===");
+Console.WriteLine($"Sector: {initialResult.PrimarySector}");
+Console.WriteLine($"Sentiment: {initialResult.Sentiment}");
+Console.WriteLine($"Summary: {initialResult.MarketImpactSummary}");
+Console.WriteLine($"Companies: {string.Join(", ", initialResult.AffectedCompanies)}");
+
+Console.WriteLine("\n=== IMPROVED RESULT ===");
+Console.WriteLine($"Sector: {improvedResult.PrimarySector}");
+Console.WriteLine($"Sentiment: {improvedResult.Sentiment}");
+Console.WriteLine($"Summary: {improvedResult.MarketImpactSummary}");
+Console.WriteLine($"Companies: {string.Join(", ", improvedResult.AffectedCompanies)}");
+
+// ======================
+// TOKEN USAGE
+// ======================
+
+Console.WriteLine("\n=== TOKEN USAGE ===");
+
+Console.WriteLine("\nFirst Call (Analysis):");
+Console.WriteLine($"Input Tokens: {initialUsage.InputTokens}");
+Console.WriteLine($"Output Tokens: {initialUsage.OutputTokens}");
+Console.WriteLine($"Total Tokens: {initialUsage.TotalTokens}");
+Console.WriteLine($"Cost: ${initialCost:F6}");
+
+Console.WriteLine("\nSecond Call (Critique):");
+Console.WriteLine($"Input Tokens: {improvedUsage.InputTokens}");
+Console.WriteLine($"Output Tokens: {improvedUsage.OutputTokens}");
+Console.WriteLine($"Total Tokens: {improvedUsage.TotalTokens}");
+Console.WriteLine($"Cost: ${improvedCost:F6}");
+
+Console.WriteLine("\n=== TOTAL ===");
+Console.WriteLine($"Total Tokens: {totalTokens}");
+Console.WriteLine($"Total Cost: ${totalCost:F6}");
