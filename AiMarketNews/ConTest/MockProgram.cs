@@ -6,11 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-
-
-using System;
-using System.Threading.Tasks;
-
 class Program2
 {
     static async Task Main(string[] args)
