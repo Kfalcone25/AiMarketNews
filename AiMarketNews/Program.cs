@@ -1,10 +1,10 @@
 ﻿using AiMarketNews.Services.LLM;
 using AiMarketNews.Services.NewsService.MockNews;
 
-var newsService = new MockNewsService();
+var newsService = new MockNewsServiceAPI();
 var llmService = new LlmService();
 
-var article = newsService.GetTopHeadlines().First();
+var article = newsService.GetTopHeadlines().Result.First();
 
 // ======================
 // FIRST CALL (ANALYSIS)

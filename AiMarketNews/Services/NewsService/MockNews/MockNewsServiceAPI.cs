@@ -19,7 +19,6 @@ namespace AiMarketNews.Services.NewsService.MockNews
             var newsService = new MockNewsServiceAPI();
             await newsService.GetTopHeadlines();
         }
-
     }
 
     public class MockNewsServiceAPI //: INewsService
@@ -44,8 +43,10 @@ namespace AiMarketNews.Services.NewsService.MockNews
         }
 
 
-        public async Task GetTopHeadlines()
+        public async Task<List<Article>> GetTopHeadlines()
         {
+            var articlesList = new List<Article>();
+
             //New Headline API Call
             var apiKey = $"{_apiKey}";
             var url = $"{_baseUrl}{_apiKey}";
@@ -57,7 +58,7 @@ namespace AiMarketNews.Services.NewsService.MockNews
             using var doc = JsonDocument.Parse(response);
             var articles = doc.RootElement.GetProperty("articles");
 
-            for (int i = 0; i <= 5; i++)
+            for (int i = 0; i <= 2; i++)
             {
                 foreach (var article in articles.EnumerateArray())
                 {
@@ -66,44 +67,20 @@ namespace AiMarketNews.Services.NewsService.MockNews
                     var description = article.GetProperty("description").GetString();
                     var published = article.GetProperty("publishedAt").GetString();
                     var urlArt = article.GetProperty("url").GetString();
-
-
-                    Console.WriteLine("Article");
-                    Console.WriteLine("Title: \t" + title);
-                    Console.WriteLine("Source: \t" + source);
-                    Console.WriteLine("Description: \t" + description);
-                    Console.WriteLine("Published: \t" + published);
-                    Console.WriteLine("Url: \t" + urlArt);
-
-                    Console.WriteLine("\n");
+                    
+                    articlesList.Add(new Article
+                    {
+                        Title = title,
+                        Source = source,
+                        Summary = description,
+                        PublishedAt = DateTime.Parse(published),
+                        Url = urlArt
+                    });
                 }
             }
+
+            return articlesList;
         }
-
-
-        //Return List News Headline Object for Response
-        /*public List<Article> GetTopHeadlines()
-        {
-            return new List<Article>
-            {
-                new Article
-                {
-                    Title = "Nvidia shares surge as AI demand drives record revenue",
-                    Source = "Reuters",
-                    Summary = "Nvidia reported record-breaking quarterly revenue driven by strong demand for AI chips, exceeding analyst expectations and boosting investor confidence.",
-                    PublishedAt = DateTime.Now.AddHours(-2),
-                    Url = "https://www.reuters.com/technology/nvidia-shares-surge-ai-demand-2024"
-                },
-                new Article
-                {
-                    Title = "AI tools continue changing developer workflows",
-                    Source = "Mock Tech Daily",
-                    Summary = "Teams are experimenting with AI-assisted workflows to speed up development and testing.",
-                    PublishedAt = DateTime.Now.AddHours(-1),
-                    Url = "https://example.com/article-2"
-                }
-            };
-        }*/
 
 
 
