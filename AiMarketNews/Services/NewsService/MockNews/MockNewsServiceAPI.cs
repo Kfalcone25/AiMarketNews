@@ -52,7 +52,7 @@ namespace AiMarketNews.Services.NewsService.MockNews
             var url = $"{_baseUrl}{_apiKey}";
 
             using var client = new HttpClient();
-            await Task.Delay(500);
+            await Task.Delay(1500);
             var response = await client.GetStringAsync(url);
 
             using var doc = JsonDocument.Parse(response);

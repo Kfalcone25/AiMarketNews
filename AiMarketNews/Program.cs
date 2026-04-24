@@ -33,40 +33,159 @@ double improvedCost = (improvedUsage.TotalTokens / 1000.0) * costPer1K;
 double totalTokens = initialUsage.TotalTokens + improvedUsage.TotalTokens;
 double totalCost = initialCost + improvedCost;
 
-// ======================
-// OUTPUT RESULTS
-// ======================
 
-Console.WriteLine("=== INITIAL RESULT ===");
-Console.WriteLine($"Sector: {initialResult.PrimarySector}");
-Console.WriteLine($"Sentiment: {initialResult.Sentiment}");
-Console.WriteLine($"Summary: {initialResult.MarketImpactSummary}");
-Console.WriteLine($"Companies: {string.Join(", ", initialResult.AffectedCompanies)}");
 
-Console.WriteLine("\n=== IMPROVED RESULT ===");
-Console.WriteLine($"Sector: {improvedResult.PrimarySector}");
-Console.WriteLine($"Sentiment: {improvedResult.Sentiment}");
-Console.WriteLine($"Summary: {improvedResult.MarketImpactSummary}");
-Console.WriteLine($"Companies: {string.Join(", ", improvedResult.AffectedCompanies)}");
+
+
+
+
+//================================================================================================================
+//SECOND HEADLINE CALL
+// ======================
+var article2 = newsService.GetTopHeadlines().Result[2];
 
 // ======================
-// TOKEN USAGE
+// FIRST CALL (ANALYSIS)
+// ======================
+var initialResponse2 = await llmService.AnalyzeArticleAsync(article2);
+
+var initialResult2 = initialResponse2.Data;
+var initialUsage2 = initialResponse2.Usage;
+
+// ======================
+// SECOND CALL (CRITIQUE)
+// ======================
+var improvedResponse2 = await llmService.CritiqueAndImproveAsync(article2, initialResult2);
+
+var improvedResult2 = improvedResponse2.Data;
+var improvedUsage2 = improvedResponse2.Usage;
+
+// ======================
+// COST CALCULATION
+// ======================
+double initialCost2 = (initialUsage2.TotalTokens / 1000.0) * costPer1K;
+double improvedCost2 = (improvedUsage2.TotalTokens / 1000.0) * costPer1K;
+
+double totalTokens2 = initialUsage2.TotalTokens + improvedUsage2.TotalTokens;
+double totalCost2 = initialCost2 + improvedCost2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//================================================================================================================
+//SECOND HEADLINE OUTPUT
+void PrintHeader(string title)
+{
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine($"\n╔══════════════════════════════════════════════════╗");
+    Console.WriteLine($"║ {title.PadRight(48)} ║");
+    Console.WriteLine($"╚══════════════════════════════════════════════════╝");
+    Console.ResetColor();
+}
+
+void PrintSection(string title)
+{
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine($"\n─── {title} ───────────────────────────────────────");
+    Console.ResetColor();
+}
+
+void PrintKeyValue(string key, string value)
+{
+    Console.ForegroundColor = ConsoleColor.Gray;
+    Console.Write($"{key,-15}: ");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine(value);
+    Console.ResetColor();
+}
+
+// ======================
+// OUTPUT
 // ======================
 
-Console.WriteLine("\n=== TOKEN USAGE ===");
+PrintHeader("INITIAL RESULT");
 
-Console.WriteLine("\nFirst Call (Analysis):");
-Console.WriteLine($"Input Tokens: {initialUsage.InputTokens}");
-Console.WriteLine($"Output Tokens: {initialUsage.OutputTokens}");
-Console.WriteLine($"Total Tokens: {initialUsage.TotalTokens}");
-Console.WriteLine($"Cost: ${initialCost:F6}");
+PrintKeyValue("Article", article.Title);
+PrintKeyValue("Sector", initialResult.PrimarySector);
+PrintKeyValue("Sentiment", initialResult.Sentiment);
+PrintKeyValue("Summary", initialResult.MarketImpactSummary);
+PrintKeyValue("Companies", string.Join(", ", initialResult.AffectedCompanies));
 
-Console.WriteLine("\nSecond Call (Critique):");
-Console.WriteLine($"Input Tokens: {improvedUsage.InputTokens}");
-Console.WriteLine($"Output Tokens: {improvedUsage.OutputTokens}");
-Console.WriteLine($"Total Tokens: {improvedUsage.TotalTokens}");
-Console.WriteLine($"Cost: ${improvedCost:F6}");
+PrintHeader("IMPROVED RESULT");
 
-Console.WriteLine("\n=== TOTAL ===");
-Console.WriteLine($"Total Tokens: {totalTokens}");
-Console.WriteLine($"Total Cost: ${totalCost:F6}");
+PrintKeyValue("Sector", improvedResult.PrimarySector);
+PrintKeyValue("Sentiment", improvedResult.Sentiment);
+PrintKeyValue("Summary", improvedResult.MarketImpactSummary);
+PrintKeyValue("Companies", string.Join(", ", improvedResult.AffectedCompanies));
+
+PrintHeader("TOKEN USAGE");
+
+PrintSection("First Call (Analysis)");
+PrintKeyValue("Input Tokens", initialUsage.InputTokens.ToString());
+PrintKeyValue("Output Tokens", initialUsage.OutputTokens.ToString());
+PrintKeyValue("Total Tokens", initialUsage.TotalTokens.ToString());
+PrintKeyValue("Cost", $"${initialCost:F6}");
+
+PrintSection("Second Call (Critique)");
+PrintKeyValue("Input Tokens", improvedUsage.InputTokens.ToString());
+PrintKeyValue("Output Tokens", improvedUsage.OutputTokens.ToString());
+PrintKeyValue("Total Tokens", improvedUsage.TotalTokens.ToString());
+PrintKeyValue("Cost", $"${improvedCost:F6}");
+
+PrintSection("TOTAL");
+PrintKeyValue("Total Tokens", totalTokens.ToString());
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine($"\n💰 Total Cost: ${totalCost:F6}");
+
+
+// =================================================================================
+
+
+PrintHeader("INITIAL RESULT 2");
+
+PrintKeyValue("Article", article2.Title);
+PrintKeyValue("Sector", initialResult2.PrimarySector);
+PrintKeyValue("Sentiment", initialResult2.Sentiment);
+PrintKeyValue("Summary", initialResult2.MarketImpactSummary);
+PrintKeyValue("Companies", string.Join(", ", initialResult2.AffectedCompanies));
+
+PrintHeader("IMPROVED RESULT");
+
+PrintKeyValue("Sector", improvedResult2.PrimarySector);
+PrintKeyValue("Sentiment", improvedResult2.Sentiment);
+PrintKeyValue("Summary", improvedResult2.MarketImpactSummary);
+PrintKeyValue("Companies", string.Join(", ", improvedResult2.AffectedCompanies));
+
+PrintHeader("TOKEN USAGE");
+
+PrintSection("First Call (Analysis)");
+PrintKeyValue("Input Tokens", initialUsage2.InputTokens.ToString());
+PrintKeyValue("Output Tokens", initialUsage2.OutputTokens.ToString());
+PrintKeyValue("Total Tokens", initialUsage2.TotalTokens.ToString());
+PrintKeyValue("Cost", $"${initialCost2:F6}");
+
+PrintSection("Second Call (Critique)");
+PrintKeyValue("Input Tokens", improvedUsage2.InputTokens.ToString());
+PrintKeyValue("Output Tokens", improvedUsage2.OutputTokens.ToString());
+PrintKeyValue("Total Tokens", improvedUsage2.TotalTokens.ToString());
+PrintKeyValue("Cost", $"${improvedCost:F6}");
+
+PrintSection("TOTAL");
+PrintKeyValue("Total Tokens", totalTokens2.ToString());
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine($"\n💰 Total Cost: ${totalCost2:F6}");
+Console.ResetColor();

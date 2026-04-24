@@ -18,15 +18,18 @@ namespace AiMarketNews.Services.LLM
 
 		public LlmService()
 		{
-			var builder = new ConfigurationBuilder()
-				.SetBasePath(Directory.GetCurrentDirectory())
-				.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\.."));
+
+            var builder = new ConfigurationBuilder()
+                //.SetBasePath(basePath)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 			_config = builder.Build();
 
-			_apiKey = _config["OpenAI:ApiKey"] ?? string.Empty;
-			_baseUrl = _config["OpenAI:BaseUrl"] ?? "https://api.openai.com/v1/responses";
-			_model = _config["OpenAI:Model"] ?? "gpt-4.1-mini";
+			_apiKey = _config["OpenAIKey:ApiKey"] ?? string.Empty;
+			_baseUrl = _config["OpenAIKey:BaseUrl"] ?? "https://api.openai.com/v1/responses";
+			_model = _config["OpenAIKey:Model"] ?? "gpt-4.1-mini";
 
 			if (string.IsNullOrWhiteSpace(_apiKey))
 				throw new InvalidOperationException("OpenAI API key not configured in appsettings.json");
