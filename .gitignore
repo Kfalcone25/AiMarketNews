@@ -19,3 +19,5 @@ Thumbs.db
 
 # Secrets (future-proof)
 .env
+appsettings.json
+appsettings.*.json
